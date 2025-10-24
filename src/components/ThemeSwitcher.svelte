@@ -15,18 +15,10 @@
 >
     <div class="sun" aria-hidden="true"></div>
     <div class="moon-overlay" aria-hidden="true"></div>
-    <div class="cloud-ball cloud-ball-left" id="ball1" aria-hidden="true"></div>
-    <div
-        class="cloud-ball cloud-ball-middle"
-        id="ball2"
-        aria-hidden="true"
-    ></div>
-    <div
-        class="cloud-ball cloud-ball-right"
-        id="ball3"
-        aria-hidden="true"
-    ></div>
-    <div class="cloud-ball cloud-ball-top" id="ball4" aria-hidden="true"></div>
+    <div class="cloud-ball cloud-ball-left" aria-hidden="true"></div>
+    <div class="cloud-ball cloud-ball-middle" aria-hidden="true"></div>
+    <div class="cloud-ball cloud-ball-right" aria-hidden="true"></div>
+    <div class="cloud-ball cloud-ball-top" aria-hidden="true"></div>
     <div class="star" id="star1" aria-hidden="true"></div>
     <div class="star" id="star2" aria-hidden="true"></div>
     <div class="star" id="star3" aria-hidden="true"></div>
@@ -36,8 +28,8 @@
 <style>
     .theme-switcher-grid {
         display: grid;
-        grid-template-columns: repeat(54, 1fr);
-        grid-template-rows: repeat(24, 1fr);
+        grid-template-columns: repeat(54, 1px);
+        grid-template-rows: repeat(24, 1px);
         gap: 0;
         position: relative;
         background-color: #0dbdf6;
@@ -49,9 +41,6 @@
             border-color 0.8s ease;
         appearance: none;
         padding: 0;
-        width: 54px;
-        height: 24px;
-        margin-left: auto;
     }
 
     .theme-switcher-grid.night-theme {
@@ -67,6 +56,7 @@
         transition:
             grid-column 0.8s ease,
             background-color 0.8s ease;
+        height: 20px;
     }
 
     .theme-switcher-grid.night-theme .sun {
@@ -79,14 +69,9 @@
         border-radius: 50%;
         transition:
             left 0.8s ease,
-            background-color 0.8s ease,
-            width 0.8s ease,
-            height 0.8s ease,
-            top 0.8s ease;
+            background-color 0.8s ease;
         z-index: 1;
         background-color: #0dbdf6;
-        width: 0;
-        height: 0;
     }
 
     .theme-switcher-grid.night-theme .moon-overlay {
@@ -108,48 +93,48 @@
         z-index: 2;
     }
 
-    #ball1 {
+    .cloud-ball-left {
         top: calc((8 / 24) * 100%);
         left: calc((12 / 54) * 100%);
     }
 
-    #ball2 {
+    .cloud-ball-middle {
         top: calc((8 / 24) * 100%);
         left: calc((17 / 54) * 100%);
     }
 
-    #ball3 {
+    .cloud-ball-right {
         top: calc((8 / 24) * 100%);
         left: calc((22 / 54) * 100%);
     }
 
-    #ball4 {
+    .cloud-ball-top {
         top: calc((6 / 24) * 100%);
         left: calc((17 / 54) * 100%);
     }
 
-    .theme-switcher-grid.night-theme #ball1 {
+    .theme-switcher-grid.night-theme .cloud-ball-left {
         top: calc((16 / 24) * 100%);
         left: calc((16 / 54) * 100%);
         width: 2px;
         height: 2px;
     }
 
-    .theme-switcher-grid.night-theme #ball2 {
+    .theme-switcher-grid.night-theme .cloud-ball-middle {
         top: calc((3 / 24) * 100%);
         left: calc((22 / 54) * 100%);
         width: 2px;
         height: 2px;
     }
 
-    .theme-switcher-grid.night-theme #ball3 {
+    .theme-switcher-grid.night-theme .cloud-ball-right {
         top: calc((10 / 24) * 100%);
         left: calc((29 / 54) * 100%);
         width: 2px;
         height: 2px;
     }
 
-    .theme-switcher-grid.night-theme #ball4 {
+    .theme-switcher-grid.night-theme .cloud-ball-top {
         top: calc((5 / 24) * 100%);
         left: calc((34 / 54) * 100%);
         width: 2px;
@@ -163,36 +148,30 @@
         position: absolute;
         opacity: 0;
         transition: opacity 0.8s ease;
+        border-radius: 50%;
     }
 
     #star1 {
         top: calc((7 / 24) * 100%);
         left: calc((10 / 54) * 100%);
-        border-radius: 50%;
     }
 
     #star2 {
         top: calc((9 / 24) * 100%);
         left: calc((16 / 54) * 100%);
-        border-radius: 50%;
     }
 
     #star3 {
         top: calc((13 / 24) * 100%);
         left: calc((23 / 54) * 100%);
-        border-radius: 50%;
     }
 
     #star4 {
         top: calc((18 / 24) * 100%);
         left: calc((29 / 54) * 100%);
-        border-radius: 50%;
     }
 
-    .theme-switcher-grid.night-theme #star1,
-    .theme-switcher-grid.night-theme #star2,
-    .theme-switcher-grid.night-theme #star3,
-    .theme-switcher-grid.night-theme #star4 {
+    .theme-switcher-grid.night-theme .star {
         opacity: 1;
     }
 </style>
