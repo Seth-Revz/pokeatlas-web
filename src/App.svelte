@@ -244,7 +244,7 @@
                     />
 
                     <FileUploader
-                        label="Spritesheet Image"
+                        label="Spritesheet Image (.png)"
                         accept="image/*"
                         onUpload={handleSpritesheetUpload}
                         currentFile={spritesheetFile?.name}
