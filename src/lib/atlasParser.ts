@@ -29,7 +29,7 @@ export function parseAtlas(content: string): AtlasData {
             const offset = parseNumberArray(lines[i + 5]);
             const index = parseInt(parseValueLine(lines[i + 6]));
 
-            const finalName = sprites.hasOwnProperty(spriteName) ? `${spriteName}_${index}` : spriteName;
+            const finalName = index !== -1 ? `${spriteName}_${index}` : spriteName;
 
             sprites[finalName] = {
                 rotate,

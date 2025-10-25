@@ -29,12 +29,8 @@ export function compileSheet(
             ctx.drawImage(sprite.canvas, sprite.x, sprite.y);
         }
 
-        const baseName = sprite.name.includes('_')
-            ? sprite.name.substring(0, sprite.name.lastIndexOf('_'))
-            : sprite.name;
-
-        if (updatedAtlas.sprites[baseName]) {
-            updatedAtlas.sprites[baseName].size = [
+        if (updatedAtlas.sprites[sprite.name]) {
+            updatedAtlas.sprites[sprite.name].size = [
                 sprite.canvas.width,
                 sprite.canvas.height
             ];
