@@ -39,8 +39,7 @@
             const zoomToFitHeight = containerHeight / sprite.height;
 
             const optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight, 20);
-
-            zoom = Math.max(0.5, Math.round(optimalZoom * 2) / 2);
+            zoom = Math.max(0.5, Math.round(optimalZoom * 10) / 10);
         } else if (fullSpritesheet && previewContent) {
             const containerWidth = previewContent.clientWidth - 64;
             const containerHeight = previewContent.clientHeight - 64;
@@ -48,8 +47,8 @@
             const zoomToFitWidth = containerWidth / fullSpritesheet.width;
             const zoomToFitHeight = containerHeight / fullSpritesheet.height;
 
-            const optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight, 10);
-            zoom = Math.max(0.5, Math.round(optimalZoom * 2) / 2);
+            const optimalZoom = Math.min(zoomToFitWidth, zoomToFitHeight, 20);
+            zoom = Math.max(0.5, Math.round(optimalZoom * 10) / 10);
         }
     });
 </script>
