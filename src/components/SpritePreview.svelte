@@ -29,13 +29,6 @@
     const imageUrl = $derived(
         sprite ? sprite.dataUrl : fullSpritesheet?.src || "",
     );
-    const imageDimensions = $derived(
-        sprite
-            ? { width: sprite.width, height: sprite.height }
-            : fullSpritesheet
-              ? { width: fullSpritesheet.width, height: fullSpritesheet.height }
-              : { width: 0, height: 0 },
-    );
 
     $effect(() => {
         if (sprite && previewContent) {
