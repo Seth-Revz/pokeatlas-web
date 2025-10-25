@@ -93,6 +93,7 @@
             ctx.drawImage(img, 0, 0);
             selectedSprite.dataUrl =
                 selectedSprite.canvas.toDataURL("image/png");
+            selectedSprite.isModified = true;
         }
 
         sprites = [...sprites];
@@ -133,6 +134,7 @@
                     ctx.drawImage(img, 0, 0);
                     matchingSprite.dataUrl =
                         matchingSprite.canvas.toDataURL("image/png");
+                    matchingSprite.isModified = true;
                 }
                 replacedCount++;
                 URL.revokeObjectURL(img.src);

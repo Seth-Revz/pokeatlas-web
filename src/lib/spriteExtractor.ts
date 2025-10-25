@@ -35,7 +35,8 @@ export function extractSprites(
             y,
             width: w,
             height: h,
-            index: data.index
+            index: data.index,
+            isModified: false
         });
     }
 

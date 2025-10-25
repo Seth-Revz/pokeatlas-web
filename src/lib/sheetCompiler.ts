@@ -14,30 +14,40 @@ export function compileSheet(
 
     ctx.clearRect(0, 0, sheetWidth, sheetHeight);
 
-    const updatedAtlas = { ...originalAtlas };
+    const locationKey = (sprite: ExtractedSprite) =>
+        `${sprite.x},${sprite.y},${sprite.width},${sprite.height}`;
+
+    const spritesByLocation = new Map<string, ExtractedSprite[]>();
 
     for (const sprite of sprites) {
-        const { originalData } = sprite;
-
-        if (originalData.rotate) {
-            ctx.save();
-            ctx.translate(sprite.x + sprite.width / 2, sprite.y + sprite.height / 2);
-            ctx.rotate(-Math.PI / 2);
-            ctx.drawImage(sprite.canvas, -sprite.canvas.width / 2, -sprite.canvas.height / 2);
-            ctx.restore();
-        } else {
-            ctx.drawImage(sprite.canvas, sprite.x, sprite.y);
+        const key = locationKey(sprite);
+        if (!spritesByLocation.has(key)) {
+            spritesByLocation.set(key, []);
         }
+        spritesByLocation.get(key)!.push(sprite);
+    }
 
-        if (updatedAtlas.sprites[sprite.name]) {
-            updatedAtlas.sprites[sprite.name].size = [
-                sprite.canvas.width,
-                sprite.canvas.height
-            ];
+    for (const [_, spritesAtLocation] of spritesByLocation) {
+        const sorted = [...spritesAtLocation].sort((a, b) =>
+            (a.isModified ? 1 : 0) - (b.isModified ? 1 : 0)
+        );
+
+        for (const sprite of sorted) {
+            const { originalData } = sprite;
+
+            if (originalData.rotate) {
+                ctx.save();
+                ctx.translate(sprite.x + sprite.width / 2, sprite.y + sprite.height / 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.drawImage(sprite.canvas, -sprite.canvas.width / 2, -sprite.canvas.height / 2);
+                ctx.restore();
+            } else {
+                ctx.drawImage(sprite.canvas, sprite.x, sprite.y);
+            }
         }
     }
 
-    const atlasText = generateAtlasText(updatedAtlas);
+    const atlasText = generateAtlasText(originalAtlas);
 
     return { canvas, atlasText };
 }
