@@ -33,17 +33,7 @@ export function compileSheet(
         );
 
         for (const sprite of sorted) {
-            const { originalData } = sprite;
-
-            if (originalData.rotate) {
-                ctx.save();
-                ctx.translate(sprite.x + sprite.width / 2, sprite.y + sprite.height / 2);
-                ctx.rotate(-Math.PI / 2);
-                ctx.drawImage(sprite.canvas, -sprite.canvas.width / 2, -sprite.canvas.height / 2);
-                ctx.restore();
-            } else {
-                ctx.drawImage(sprite.canvas, sprite.x, sprite.y);
-            }
+            ctx.drawImage(sprite.canvas, sprite.x, sprite.y);
         }
     }
 

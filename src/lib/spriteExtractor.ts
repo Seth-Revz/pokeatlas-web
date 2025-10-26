@@ -1,4 +1,5 @@
 import type { AtlasData, ExtractedSprite } from '../types';
+import UPNG from 'upng-js';
 
 export function extractSprites(
     image: HTMLImageElement,
@@ -6,30 +7,59 @@ export function extractSprites(
 ): ExtractedSprite[] {
     const sprites: ExtractedSprite[] = [];
 
-    for (const [name, data] of Object.entries(atlasData.sprites)) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) continue;
+    const sourceCanvas = document.createElement('canvas');
+    sourceCanvas.width = image.width;
+    sourceCanvas.height = image.height;
+    const sourceCtx = sourceCanvas.getContext('2d', { alpha: true });
+    if (!sourceCtx) return sprites;
+    sourceCtx.drawImage(image, 0, 0);
 
+    const sheetImageData = sourceCtx.getImageData(0, 0, image.width, image.height);
+    const sheetData = sheetImageData.data;
+
+    for (const [name, data] of Object.entries(atlasData.sprites)) {
         const [x, y] = data.xy;
         const [w, h] = data.size;
 
-        if (data.rotate) {
-            canvas.width = h;
-            canvas.height = w;
-            ctx.translate(h / 2, w / 2);
-            ctx.rotate(Math.PI / 2);
-            ctx.drawImage(image, x, y, w, h, -w / 2, -h / 2, w, h);
-        } else {
-            canvas.width = w;
-            canvas.height = h;
-            ctx.drawImage(image, x, y, w, h, 0, 0, w, h);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { alpha: true });
+
+        if (!ctx) continue;
+
+        const spriteImageData = ctx.createImageData(w, h);
+        const dst = spriteImageData.data;
+
+        for (let row = 0; row < h; row++) {
+            const srcRow = (y + row) * image.width;
+            const dstRow = row * w;
+
+            for (let col = 0; col < w; col++) {
+                const srcIdx = (srcRow + (x + col)) * 4;
+                const dstIdx = (dstRow + col) * 4;
+
+                dst[dstIdx] = sheetData[srcIdx];
+                dst[dstIdx + 1] = sheetData[srcIdx + 1];
+                dst[dstIdx + 2] = sheetData[srcIdx + 2];
+                dst[dstIdx + 3] = sheetData[srcIdx + 3];
+            }
         }
+
+        ctx.putImageData(spriteImageData, 0, 0);
+
+        let finalCanvas = canvas;
+        let finalImageData = spriteImageData;
+
+        const rgbaBuf = finalImageData.data.buffer;
+        const pngArrayBuffer = UPNG.encode([rgbaBuf], finalCanvas.width, finalCanvas.height, 0);
+        const blob = new Blob([pngArrayBuffer], { type: 'image/png' });
+        const dataUrl = URL.createObjectURL(blob);
 
         sprites.push({
             name,
-            canvas,
-            dataUrl: canvas.toDataURL('image/png'),
+            canvas: finalCanvas,
+            dataUrl,
             originalData: data,
             x,
             y,
