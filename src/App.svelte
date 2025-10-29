@@ -7,7 +7,7 @@
     import SpriteList from "./components/SpriteList.svelte";
     import SpritePreview from "./components/SpritePreview.svelte";
     import ThemeSwitcher from "./components/ThemeSwitcher.svelte";
-    import backgroundUrl from "./assets/background.mp4";
+    import backgroundUrl from "./assets/background.webm";
     import JSZip from "jszip";
 
     let atlasFile = $state<File | null>(null);
@@ -226,7 +226,7 @@
                 muted
                 playsinline
             >
-                <source src={backgroundUrl} type="video/mp4" />
+                <source src={backgroundUrl} type="video/webm" />
             </video>
             <div class="upload-container">
                 <div class="branding">
