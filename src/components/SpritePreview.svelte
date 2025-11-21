@@ -27,7 +27,7 @@
     }
 
     const imageUrl = $derived(
-        sprite ? sprite.dataUrl : fullSpritesheet?.src || "",
+        sprite ? sprite.previewUrl : fullSpritesheet?.src || "",
     );
 
     $effect(() => {

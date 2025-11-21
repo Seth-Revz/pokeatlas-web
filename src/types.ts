@@ -19,7 +19,7 @@ export interface AtlasData {
 export interface ExtractedSprite {
     name: string;
     canvas: HTMLCanvasElement;
-    dataUrl: string;
+    blob: Blob;
     originalData: AtlasSprite;
     x: number;
     y: number;
@@ -27,4 +27,5 @@ export interface ExtractedSprite {
     height: number;
     index: number;
     isModified: boolean;
+    previewUrl: string
 }

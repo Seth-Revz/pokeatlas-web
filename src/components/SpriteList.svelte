@@ -54,7 +54,7 @@
                 onclick={() => onSelect(sprite)}
             >
                 <div class="sprite-thumb">
-                    <img src={sprite.dataUrl} alt={sprite.name} />
+                    <img src={sprite.previewUrl} alt={sprite.name} />
                 </div>
                 <div class="sprite-info">
                     <div class="sprite-name">{sprite.name}</div>

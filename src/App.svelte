@@ -85,16 +85,28 @@
             return;
         }
 
-        selectedSprite.canvas.width = img.width;
-        selectedSprite.canvas.height = img.height;
-        const ctx = selectedSprite.canvas.getContext("2d");
-        if (ctx) {
-            ctx.clearRect(0, 0, img.width, img.height);
-            ctx.drawImage(img, 0, 0);
-            selectedSprite.dataUrl =
-                selectedSprite.canvas.toDataURL("image/png");
-            selectedSprite.isModified = true;
+        const canvas = selectedSprite.canvas;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, img.width, img.height);
+        ctx.drawImage(img, 0, 0);
+
+        const blob: Blob | null = await new Promise((resolve) => {
+            canvas.toBlob(resolve, "image/png");
+        });
+
+        if (!blob) return;
+
+        if (selectedSprite.previewUrl) {
+            URL.revokeObjectURL(selectedSprite.previewUrl);
         }
+
+        selectedSprite.blob = blob;
+        selectedSprite.previewUrl = URL.createObjectURL(blob);
+        selectedSprite.isModified = true;
 
         sprites = [...sprites];
     }
@@ -109,36 +121,53 @@
         for (const file of Array.from(files)) {
             const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
 
-            const matchingSprite = sprites.find(
-                (s) => s.name === nameWithoutExt,
+            const matchingSprite = sprites.find((s) => s.name === nameWithoutExt);
+            if (!matchingSprite) continue;
+
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            await img.decode();
+
+            const dimensionsMatch =
+                img.width === matchingSprite.width &&
+                img.height === matchingSprite.height;
+
+            if (!dimensionsMatch) {
+                URL.revokeObjectURL(img.src);
+                continue;
+            }
+
+            const canvas = matchingSprite.canvas;
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+                URL.revokeObjectURL(img.src);
+                continue;
+            }
+
+            ctx.clearRect(0, 0, img.width, img.height);
+            ctx.drawImage(img, 0, 0);
+
+            const blob: Blob | null = await new Promise((resolve) =>
+                canvas.toBlob(resolve, "image/png")
             );
 
-            if (matchingSprite) {
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await img.decode();
-
-                const dimensionsMatch =
-                    img.width === matchingSprite.width &&
-                    img.height === matchingSprite.height;
-
-                if (!dimensionsMatch) {
-                    return;
-                }
-
-                matchingSprite.canvas.width = img.width;
-                matchingSprite.canvas.height = img.height;
-                const ctx = matchingSprite.canvas.getContext("2d");
-                if (ctx) {
-                    ctx.clearRect(0, 0, img.width, img.height);
-                    ctx.drawImage(img, 0, 0);
-                    matchingSprite.dataUrl =
-                        matchingSprite.canvas.toDataURL("image/png");
-                    matchingSprite.isModified = true;
-                }
-                replacedCount++;
+            if (!blob) {
                 URL.revokeObjectURL(img.src);
+                continue;
             }
+
+            if (matchingSprite.previewUrl) {
+                URL.revokeObjectURL(matchingSprite.previewUrl);
+            }
+
+            matchingSprite.blob = blob;
+            matchingSprite.previewUrl = URL.createObjectURL(blob);
+            matchingSprite.isModified = true;
+
+            replacedCount++;
+            URL.revokeObjectURL(img.src);
         }
 
         sprites = [...sprites];
@@ -150,7 +179,7 @@
     function downloadSprite(sprite: ExtractedSprite) {
         const link = document.createElement("a");
         link.download = `${sprite.name}.png`;
-        link.href = sprite.dataUrl;
+        link.href = URL.createObjectURL(sprite.blob);
         link.click();
     }
 
@@ -158,8 +187,7 @@
         const zip = new JSZip();
 
         sprites.forEach((sprite) => {
-            const base64Data = sprite.dataUrl.split(",")[1];
-            zip.file(`${sprite.name}.png`, base64Data, { base64: true });
+            zip.file(`${sprite.name}.png`, sprite.blob);
         });
 
         const blob = await zip.generateAsync({ type: "blob" });

@@ -54,19 +54,19 @@ export function extractSprites(
         const rgbaBuf = finalImageData.data.buffer;
         const pngArrayBuffer = UPNG.encode([rgbaBuf], finalCanvas.width, finalCanvas.height, 0);
         const blob = new Blob([pngArrayBuffer], { type: 'image/png' });
-        const dataUrl = URL.createObjectURL(blob);
 
         sprites.push({
             name,
             canvas: finalCanvas,
-            dataUrl,
+            blob,
             originalData: data,
             x,
             y,
             width: w,
             height: h,
             index: data.index,
-            isModified: false
+            isModified: false,
+            previewUrl: URL.createObjectURL(blob)
         });
     }
 
