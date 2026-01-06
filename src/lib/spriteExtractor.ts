@@ -1,10 +1,9 @@
 import type { AtlasData, ExtractedSprite } from '../types';
-import UPNG from 'upng-js';
 
-export function extractSprites(
+export async function extractSprites(
     image: HTMLImageElement,
     atlasData: AtlasData
-): ExtractedSprite[] {
+): Promise<ExtractedSprite[]> {
     const sprites: ExtractedSprite[] = [];
 
     const sourceCanvas = document.createElement('canvas');
@@ -48,16 +47,16 @@ export function extractSprites(
 
         ctx.putImageData(spriteImageData, 0, 0);
 
-        let finalCanvas = canvas;
-        let finalImageData = spriteImageData;
-
-        const rgbaBuf = finalImageData.data.buffer;
-        const pngArrayBuffer = UPNG.encode([rgbaBuf], finalCanvas.width, finalCanvas.height, 0);
-        const blob = new Blob([pngArrayBuffer], { type: 'image/png' });
+        const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob((b) => {
+                if (b) resolve(b);
+                else reject(new Error('Failed to create blob'));
+            }, 'image/png');
+        });
 
         sprites.push({
             name,
-            canvas: finalCanvas,
+            canvas,
             blob,
             originalData: data,
             x,

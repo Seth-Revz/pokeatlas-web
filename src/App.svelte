@@ -51,7 +51,7 @@
         atlasData = parseAtlas(text);
 
         if (spritesheetImage && atlasData) {
-            sprites = extractSprites(spritesheetImage, atlasData);
+            sprites = await extractSprites(spritesheetImage, atlasData);
             selectedSprite = null;
         }
     }
@@ -65,7 +65,7 @@
         spritesheetImage = img;
 
         if (atlasData && spritesheetImage) {
-            sprites = extractSprites(spritesheetImage, atlasData);
+            sprites = await extractSprites(spritesheetImage, atlasData);
             selectedSprite = null;
         }
     }
