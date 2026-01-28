@@ -20,6 +20,11 @@ export async function extractSprites(
         const [x, y] = data.xy;
         const [w, h] = data.size;
 
+        if (w <= 0 || h <= 0 || !isFinite(w) || !isFinite(h)) {
+            console.warn(`Skipping sprite "${name}" with invalid dimensions: ${w}x${h}`);
+            continue;
+        }
+
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
@@ -65,7 +70,8 @@ export async function extractSprites(
             height: h,
             index: data.index,
             isModified: false,
-            previewUrl: URL.createObjectURL(blob)
+            previewUrl: URL.createObjectURL(blob),
+            isNew: false
         });
     }
 

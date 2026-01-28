@@ -1,10 +1,11 @@
 import type { AtlasData, ExtractedSprite } from '../types';
+import { calculateRequiredSize } from './sheetPacker';
 
 export function compileSheet(
     sprites: ExtractedSprite[],
     originalAtlas: AtlasData
 ): { canvas: HTMLCanvasElement; atlasText: string } {
-    const [sheetWidth, sheetHeight] = originalAtlas.size;
+    const [sheetWidth, sheetHeight] = calculateRequiredSize(sprites, originalAtlas.size);
 
     const canvas = document.createElement('canvas');
     canvas.width = sheetWidth;
@@ -37,27 +38,33 @@ export function compileSheet(
         }
     }
 
-    const atlasText = generateAtlasText(originalAtlas);
+    const atlasText = generateAtlasText(sprites, originalAtlas, sheetWidth, sheetHeight);
 
     return { canvas, atlasText };
 }
 
-function generateAtlasText(atlas: AtlasData): string {
+function generateAtlasText(
+    sprites: ExtractedSprite[],
+    atlas: AtlasData,
+    sheetWidth: number,
+    sheetHeight: number
+): string {
     let text = `${atlas.imageName}\n`;
-    text += `size: ${atlas.size[0]}, ${atlas.size[1]}\n`;
+    text += `size: ${sheetWidth}, ${sheetHeight}\n`;
     text += `format: ${atlas.format}\n`;
     text += `filter: ${atlas.filter[0]}, ${atlas.filter[1]}\n`;
     text += `repeat: ${atlas.repeat}\n`;
 
-    for (const [name, data] of Object.entries(atlas.sprites)) {
-        const originalName = name.endsWith(`_${data.index}`)
-            ? name.slice(0, -(`_${data.index}`.length))
-            : name;
+    for (const sprite of sprites) {
+        const data = sprite.originalData;
+        const originalName = sprite.name.endsWith(`_${data.index}`)
+            ? sprite.name.slice(0, -(`_${data.index}`.length))
+            : sprite.name;
 
         text += `${originalName}\n`;
         text += `  rotate: ${data.rotate}\n`;
-        text += `  xy: ${data.xy[0]}, ${data.xy[1]}\n`;
-        text += `  size: ${data.size[0]}, ${data.size[1]}\n`;
+        text += `  xy: ${sprite.x}, ${sprite.y}\n`;
+        text += `  size: ${sprite.width}, ${sprite.height}\n`;
         text += `  orig: ${data.orig[0]}, ${data.orig[1]}\n`;
         text += `  offset: ${data.offset[0]}, ${data.offset[1]}\n`;
         text += `  index: ${data.index}\n`;

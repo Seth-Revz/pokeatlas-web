@@ -3,10 +3,12 @@
     import { parseAtlas } from "./lib/atlasParser";
     import { extractSprites } from "./lib/spriteExtractor";
     import { compileSheet } from "./lib/sheetCompiler";
+    import { findFreeSpace, validateSpriteName } from "./lib/sheetPacker";
     import FileUploader from "./components/FileUploader.svelte";
     import SpriteList from "./components/SpriteList.svelte";
     import SpritePreview from "./components/SpritePreview.svelte";
     import ThemeSwitcher from "./components/ThemeSwitcher.svelte";
+    import AddSpriteModal from "./components/AddSpriteModal.svelte";
     import backgroundUrl from "./assets/background.webm";
     import JSZip from "jszip";
 
@@ -18,6 +20,7 @@
     let selectedSprite = $state<ExtractedSprite | null>(null);
     let isProcessing = $state(false);
     let darkMode = $state(false);
+    let showAddModal = $state(false);
     // svelte-ignore non_reactive_update
     let massReplaceInput: HTMLInputElement;
 
@@ -239,6 +242,81 @@
     function selectSprite(sprite: ExtractedSprite | null) {
         selectedSprite = sprite;
     }
+
+    async function handleAddNewSprite(file: File, spriteName: string) {
+        const validationError = validateSpriteName(spriteName, sprites);
+        if (validationError) {
+            throw new Error(validationError);
+        }
+
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        await img.decode();
+
+        const sheetWidth = spritesheetImage?.width || atlasData?.size[0] || 512;
+        const sheetHeight = spritesheetImage?.height || atlasData?.size[1] || 512;
+
+        const space = findFreeSpace(
+            sprites,
+            img.width,
+            img.height,
+            sheetWidth,
+            sheetHeight
+        );
+
+        if (!space) {
+            throw new Error('No hay espacio disponible en el spritesheet. Intenta con un sprite más pequeño.');
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            URL.revokeObjectURL(img.src);
+            throw new Error('No se pudo crear el contexto del canvas');
+        }
+
+        ctx.drawImage(img, 0, 0);
+
+        const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob((b) => {
+                if (b) resolve(b);
+                else reject(new Error('Failed to create blob'));
+            }, 'image/png');
+        });
+
+        URL.revokeObjectURL(img.src);
+
+        if (!blob) {
+            throw new Error('No se pudo crear el blob de la imagen');
+        }
+
+        const newSprite: ExtractedSprite = {
+            name: spriteName,
+            canvas,
+            blob,
+            originalData: {
+                rotate: false,
+                xy: [space.x, space.y],
+                size: [img.width, img.height],
+                orig: [img.width, img.height],
+                offset: [0, 0],
+                index: -1
+            },
+            x: space.x,
+            y: space.y,
+            width: img.width,
+            height: img.height,
+            index: -1,
+            isModified: false,
+            isNew: true,
+            previewUrl: URL.createObjectURL(blob)
+        };
+
+        sprites = [...sprites, newSprite];
+        showAddModal = false;
+    }
 </script>
 
 <div class="app">
@@ -291,6 +369,13 @@
                 class="btn btn-primary"
             >
                 Mass Replace
+            </button>
+
+            <button
+                onclick={() => showAddModal = true}
+                class="btn btn-success"
+            >
+                + Add New Sprite
             </button>
             <input
                 bind:this={massReplaceInput}
@@ -347,6 +432,14 @@
         </div>
     {/if}
 </div>
+
+{#if showAddModal}
+    <AddSpriteModal
+        existingSprites={sprites.map(s => s.name)}
+        onAdd={handleAddNewSprite}
+        onCancel={() => showAddModal = false}
+    />
+{/if}
 
 <style>
     :global(html) {
@@ -515,6 +608,15 @@
 
     .btn-primary:hover:not(:disabled) {
         background: #0056b3;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+        background: #218838;
     }
 
     .main-content {

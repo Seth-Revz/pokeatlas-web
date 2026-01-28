@@ -27,5 +27,6 @@ export interface ExtractedSprite {
     height: number;
     index: number;
     isModified: boolean;
-    previewUrl: string
+    previewUrl: string;
+    isNew: boolean;
 }
