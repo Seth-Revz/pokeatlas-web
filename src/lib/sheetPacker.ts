@@ -121,15 +121,15 @@ function rectsOverlap(
 
 export function validateSpriteName(name: string, existingSprites: ExtractedSprite[]): string | null {
     if (!name || name.trim().length === 0) {
-        return 'El nombre del sprite no puede estar vacío';
+        return 'Sprite name cannot be empty';
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
-        return 'El nombre solo puede contener letras, números, guiones y guiones bajos';
+        return 'Name can only contain letters, numbers, hyphens, and underscores';
     }
 
     if (existingSprites.some(s => s.name === name)) {
-        return `El sprite "${name}" ya existe en el atlas`;
+        return `Sprite "${name}" already exists in the atlas`;
     }
 
     return null;

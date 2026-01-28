@@ -265,7 +265,7 @@
         );
 
         if (!space) {
-            throw new Error('No hay espacio disponible en el spritesheet. Intenta con un sprite más pequeño.');
+            throw new Error('No space available in the spritesheet. Try a smaller sprite.');
         }
 
         const canvas = document.createElement('canvas');
@@ -274,7 +274,7 @@
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             URL.revokeObjectURL(img.src);
-            throw new Error('No se pudo crear el contexto del canvas');
+            throw new Error('Could not create canvas context');
         }
 
         ctx.drawImage(img, 0, 0);
@@ -289,7 +289,7 @@
         URL.revokeObjectURL(img.src);
 
         if (!blob) {
-            throw new Error('No se pudo crear el blob de la imagen');
+            throw new Error('Could not create image blob');
         }
 
         const newSprite: ExtractedSprite = {

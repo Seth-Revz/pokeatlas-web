@@ -13,17 +13,18 @@
     let validationError = $state('');
     let isProcessing = $state(false);
     let fileInput: HTMLInputElement;
+    let nameTouched = $state(false);
 
     const nameValidationError = $derived(
-        !spriteName ? 'El nombre del sprite es requerido' :
-        !/^[a-zA-Z0-9_-]+$/.test(spriteName) ? 'Solo letras, números, guiones y guiones bajos' :
-        existingSprites.includes(spriteName) ? `El sprite "${spriteName}" ya existe` :
+        !spriteName ? 'Sprite name is required' :
+        !/^[a-zA-Z0-9_-]+$/.test(spriteName) ? 'Only letters, numbers, hyphens, and underscores' :
+        existingSprites.includes(spriteName) ? `Sprite "${spriteName}" already exists` :
         ''
     );
 
     const isValid = $derived(
-        uploadedFile !== null && 
-        nameValidationError === '' && 
+        uploadedFile !== null &&
+        (spriteName && nameValidationError === '') &&
         !isProcessing
     );
 
@@ -36,7 +37,7 @@
         }
 
         if (!file.type.startsWith('image/')) {
-            validationError = 'Por favor sube un archivo de imagen válido';
+            validationError = 'Please upload a valid image file';
             uploadedFile = null;
             previewUrl = '';
             return;
@@ -51,13 +52,15 @@
             previewUrl = img.src;
             validationError = '';
         } catch (error) {
-            validationError = 'Error al cargar la imagen';
+            validationError = 'Error loading image';
             uploadedFile = null;
             previewUrl = '';
         }
     }
 
     async function handleAdd() {
+        nameTouched = true;
+
         if (!isValid) return;
 
         isProcessing = true;
@@ -66,7 +69,7 @@
         try {
             await onAdd(uploadedFile!, spriteName);
         } catch (error) {
-            validationError = error instanceof Error ? error.message : 'Error al agregar el sprite';
+            validationError = error instanceof Error ? error.message : 'Error adding sprite';
             isProcessing = false;
         }
     }
@@ -110,13 +113,13 @@
 >
     <div class="modal">
         <div class="modal-header">
-            <h2 id="modal-title">Agregar Nuevo Sprite</h2>
-            <button class="close-btn" onclick={handleCancel} aria-label="Cerrar modal">✕</button>
+            <h2 id="modal-title">Add New Sprite</h2>
+            <button class="close-btn" onclick={handleCancel} aria-label="Close modal">✕</button>
         </div>
 
         <div class="modal-body">
             <div class="form-group">
-                <label for="sprite-file">Archivo de Imagen (PNG)</label>
+                <label for="sprite-file">Image File (PNG)</label>
                 <input
                     bind:this={fileInput}
                     id="sprite-file"
@@ -129,7 +132,7 @@
 
             {#if previewUrl}
                 <div class="preview-section">
-                    <div class="preview-label">Vista Previa</div>
+                    <div class="preview-label">Preview</div>
                     <div class="preview-container">
                         <img src={previewUrl} alt="Sprite preview" />
                     </div>
@@ -137,16 +140,17 @@
             {/if}
 
             <div class="form-group">
-                <label for="sprite-name">Nombre del Sprite</label>
+                <label for="sprite-name">Sprite Name</label>
                 <input
                     id="sprite-name"
                     type="text"
                     bind:value={spriteName}
-                    placeholder="ej: new_character"
+                    placeholder="e.g: new_character"
                     disabled={isProcessing}
-                    class:name-error={nameValidationError !== ''}
+                    class:name-error={nameValidationError !== '' && nameTouched}
+                    onblur={() => nameTouched = true}
                 />
-                {#if nameValidationError}
+                {#if nameValidationError && nameTouched}
                     <div class="error-message">{nameValidationError}</div>
                 {/if}
             </div>
@@ -157,19 +161,19 @@
         </div>
 
         <div class="modal-footer">
-            <button 
-                class="btn btn-secondary" 
+            <button
+                class="btn btn-secondary"
                 onclick={handleCancel}
                 disabled={isProcessing}
             >
-                Cancelar
+                Cancel
             </button>
-            <button 
-                class="btn btn-primary" 
+            <button
+                class="btn btn-primary"
                 onclick={handleAdd}
                 disabled={!isValid || isProcessing}
             >
-                {isProcessing ? 'Procesando...' : 'Agregar Sprite'}
+                {isProcessing ? 'Processing...' : 'Add Sprite'}
             </button>
         </div>
     </div>
