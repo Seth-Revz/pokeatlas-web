@@ -51,6 +51,11 @@
             uploadedFile = file;
             previewUrl = img.src;
             validationError = '';
+
+            if (!nameTouched) {
+                const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+                spriteName = nameWithoutExt;
+            }
         } catch (error) {
             validationError = 'Error loading image';
             uploadedFile = null;
