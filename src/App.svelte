@@ -314,7 +314,12 @@
             previewUrl: URL.createObjectURL(blob)
         };
 
-        sprites = [...sprites, newSprite];
+        const allSprites = [...sprites, newSprite];
+        allSprites.sort((a, b) => {
+            if (a.name === b.name) return a.index - b.index;
+            return a.name.localeCompare(b.name);
+        });
+        sprites = allSprites;
         showAddModal = false;
     }
 </script>
