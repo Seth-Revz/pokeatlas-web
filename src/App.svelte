@@ -292,6 +292,9 @@
             throw new Error('Could not create image blob');
         }
 
+        const indexMatch = spriteName.match(/^(.+?)_(\d+)$/);
+        const spriteIndex = indexMatch ? parseInt(indexMatch[2], 10) : -1;
+
         const newSprite: ExtractedSprite = {
             name: spriteName,
             canvas,
@@ -302,13 +305,13 @@
                 size: [img.width, img.height],
                 orig: [img.width, img.height],
                 offset: [0, 0],
-                index: -1
+                index: spriteIndex
             },
             x: space.x,
             y: space.y,
             width: img.width,
             height: img.height,
-            index: -1,
+            index: spriteIndex,
             isModified: false,
             isNew: true,
             previewUrl: URL.createObjectURL(blob)
