@@ -77,7 +77,7 @@ export async function extractSprites(
 
     sprites.sort((a, b) => {
         if (a.name === b.name) return a.index - b.index;
-        return a.name.localeCompare(b.name);
+        return a.name.localeCompare(b.name, undefined, { numeric: true });
     });
 
     return sprites;
