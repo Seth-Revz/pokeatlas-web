@@ -381,7 +381,7 @@
 
             <button
                 onclick={() => showAddModal = true}
-                class="btn btn-success"
+                class="btn btn-primary"
             >
                 + Add New Sprite
             </button>
@@ -616,15 +616,6 @@
 
     .btn-primary:hover:not(:disabled) {
         background: #0056b3;
-    }
-
-    .btn-success {
-        background: #28a745;
-        color: white;
-    }
-
-    .btn-success:hover:not(:disabled) {
-        background: #218838;
     }
 
     .main-content {
