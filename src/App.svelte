@@ -5,6 +5,7 @@
     import { compileSheet } from "./lib/sheetCompiler";
     import { findFreeSpace, validateSpriteName } from "./lib/sheetPacker";
     import FileUploader from "./components/FileUploader.svelte";
+    import ActionButton from "./components/DefaultButton.svelte";
     import SpriteList from "./components/SpriteList.svelte";
     import SpritePreview from "./components/SpritePreview.svelte";
     import ThemeSwitcher from "./components/ThemeSwitcher.svelte";
@@ -71,6 +72,47 @@
             sprites = await extractSprites(spritesheetImage, atlasData);
             selectedSprite = null;
         }
+    }
+
+    async function handleDefaultAtlas() {
+        atlasFile = await downloadAsFile(
+            "https://s.pok.events/a/atlas/main.atlas",
+            "main.atlas"
+        );
+
+        const text = await atlasFile.text();
+        atlasData = parseAtlas(text);
+
+        spritesheetFile = await downloadAsFile(
+            "https://s.pok.events/a/atlas/main.png",
+            "main.png"
+        );
+
+        const img = new Image();
+        img.src = URL.createObjectURL(spritesheetFile);
+        await img.decode();
+        spritesheetImage = img;
+
+        console.log(spritesheetFile)
+
+        if (atlasData && spritesheetImage) {
+            sprites = await extractSprites(spritesheetImage, atlasData);
+            selectedSprite = null;
+        }
+    }
+
+    async function downloadAsFile(url: string, filename: string): Promise<File> {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+
+        return new File([blob], filename, {
+            type: blob.type,
+        });
     }
 
     async function handleSpriteReplace(file: File) {
@@ -366,6 +408,13 @@
                         currentFile={spritesheetFile?.name}
                     />
                 </div>
+
+                <div class="button-container">
+                    <ActionButton
+                        label="Use the current default Atlas files"
+                        onClick={handleDefaultAtlas}
+                    />
+                </div>
             </div>
         </div>
     {:else}
@@ -537,6 +586,12 @@
         width: 100%;
         max-width: 900px;
         margin: 0 auto;
+    }
+
+    .button-container {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
     }
 
     .toolbar {
