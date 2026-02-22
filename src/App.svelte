@@ -31,7 +31,7 @@
 
     $effect(() => {
         const saved = localStorage.getItem("darkMode");
-        darkMode = saved === "true";
+        darkMode = saved === null ? true : saved === "true";
         updateTheme(darkMode);
     });
 
